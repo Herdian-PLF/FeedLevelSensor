@@ -7,3 +7,13 @@ simulation/out/
 *.zip
 python-poc/driver/
 python-poc/captures/
+
+*.png
+*.PNG
+*.jpg
+*.jpeg
+*.JPG
+*.JPEG
+
+.pio/
+compile_commands.json
