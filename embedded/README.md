@@ -3,7 +3,7 @@
 Electronic modules used:
 * ESP32-WROOM-32 (30 pins)
 * TMF8829 eval board
-* TODO: LoRa module name
+* EBYTE E32-900T20D (SX1276, 915 MHz, UART)
 
 # Developer Setup
 

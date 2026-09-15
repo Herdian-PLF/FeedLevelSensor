@@ -17,7 +17,6 @@
 namespace {
 
 const uint32_t PRINT_PERIOD_MS = 5000;
-const uint32_t TOF_I2C_READ_HZ = 400000;
 const uint8_t GRID = 8;
 
 #ifndef TOF_PRECONFIG
@@ -41,7 +40,7 @@ uint32_t lastPrint = 0;
 bool bringUp() {
   pinMode(PIN_TOF_EN, OUTPUT);
   pinMode(PIN_TOF_INT, INPUT_PULLUP);
-  Wire.begin(PIN_TOF_SDA, PIN_TOF_SCL, TOF_I2C_READ_HZ);
+  Wire.begin(PIN_TOF_SDA, PIN_TOF_SCL, TOF_I2C_HZ);
 
   tmf8829Initialise(&driver);
   driver.i2cSlaveAddress = TOF_I2C_ADDR;
