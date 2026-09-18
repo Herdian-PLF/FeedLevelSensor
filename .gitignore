@@ -18,3 +18,4 @@ python-poc/captures/
 .pio/
 compile_commands.json
 embedded/hardware_verification/vendor/
+embedded/silometer_endpoint/vendor/
