@@ -1,0 +1,24 @@
+[project]
+name = "synthetic-dataset"
+version = "0.1.0"
+description = "Synthetic labelled depth dataset generator for the TMF8829 observing silo feed surfaces"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.1",
+    "opencv-python-headless>=4.10",
+    "tifffile>=2025.5",
+    "pyyaml>=6.0",
+    "matplotlib>=3.9",
+    "ipykernel>=6.29",
+]
+
+[dependency-groups]
+dev = ["nbconvert>=7.16"]
+
+[tool.uv]
+package = false
+# cv2 is only ever called for cv2.resize, so the headless wheel is enough and it skips
+# the GUI/GL stack that opencv-python drags in and that has no display under WSL.
+# Conda must not back this venv: it is always on PATH here, and the repo already lost a
+# Jupyter kernel that way (see python-poc/pyproject.toml).
+python-preference = "only-managed"

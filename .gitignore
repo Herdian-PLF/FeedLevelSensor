@@ -4,6 +4,7 @@ __pycache__/
 .pytest_cache/
 
 simulation/out/
+synthetic-dataset/out/
 *.zip
 python-poc/driver/
 python-poc/captures/

@@ -1,0 +1,198 @@
+# Geometria fisica dos silos usados no simulador.
+#
+# Convencao global de coordenadas:
+#
+#   y = 0  ->  interface entre a tremonha e o corpo cilindrico
+#
+#   corpo cilindrico:  0 <= y <= cylinder_height_m
+#   teto:              cylinder_height_m <= y <= cylinder_height_m + roof_height_m
+#   tremonha:          -hopper_height_m <= y <= 0
+#   saida / vao:       -(hopper_height_m + outlet_height_m) <= y <= -hopper_height_m
+#
+#   roof_top_y_m = cylinder_height_m + roof_height_m
+#   bottom_y_m   = -(hopper_height_m + outlet_height_m)
+#
+#   roof_top_y_m - bottom_y_m = total_height_m   (validado ao carregar cada silo)
+#
+# ---------------------------------------------------------------------------
+# CORTE DO TOPO (boca da tampa)
+# ---------------------------------------------------------------------------
+# Nenhum silo termina em apice fechado: todos tem um furo no topo para a
+# tampa / escotilha. O cone do chapeu e portanto um TRONCO de cone, cortado
+# em roof_top_radius_m.
+#
+# roof_height_reference diz a que ponto a cota roof_height_m se refere:
+#
+#   apex     -> cota do APICE do cone cheio (r = 0).
+#               Confirmado pelos angulos exatos do catalogo CASP:
+#               teto = 40.00 graus e tremonha = 60.00 graus
+#               (o "-60" do nome do modelo e o angulo da tremonha).
+#               A boca da tampa fica ABAIXO dessa cota, em
+#               cylinder_height_m + (1 - roof_cut_fraction) * roof_height_m.
+#               Acima da boca fica a tampa / colarinho, que completa a
+#               total_height_m do catalogo.
+#
+#   opening  -> cota da propria BOCA da tampa (topo do tronco de cone).
+#               E o caso do Mombuca, medido em campo junto com o
+#               roof_top_radius_m.
+#
+# roof_cut_fraction e a fracao do cone removida no topo. Como o corte de um
+# cone e auto-semelhante, a mesma fracao vale para o raio e para a altura.
+#
+#   roof_top_radius_m = roof_cut_fraction * radius_m
+#
+# Para o Mombuca a fracao e DERIVADA da medida real (0.305 / 1.150 = 0.2652):
+# o chapeu tem 0.61 m de diametro no topo, medido em campo.
+#
+# Para os CASP nao temos a medida do furo, entao adotamos 0.10 como premissa:
+# um corte pequeno, so o necessario para o furo da tampa.
+#
+# O sensor nunca pode passar da boca da tampa: o teto fisico que limita a
+# pose e o plano da boca, nao o apice. Acima da boca nada e modelado nem
+# desenhado - a geometria util termina no corte.
+
+reference_density_t_per_m3: 0.64
+
+silos:
+
+  - model: "36-02-60"
+    source: CASP
+    geometry:
+      radius_m: 1.830
+      cylinder_height_m: 1.840
+      roof_height_m: 1.5356
+      roof_height_reference: apex
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.10
+      roof_top_radius_source: cut_fraction
+      roof_top_radius_m: 0.1830
+      hopper_height_m: 2.9098
+      outlet_radius_m: 0.150
+      outlet_height_m: 0.3646
+      total_height_m: 6.650
+    catalog:
+      code: "31.530.402"
+      diameter_m: 3.66
+      rings: 2.0
+      height_m: 6.65
+      volume_m3: 33.19
+      capacity_t: 21.24
+
+  - model: "30-04-60"
+    source: CASP
+    geometry:
+      radius_m: 1.480
+      cylinder_height_m: 3.680
+      roof_height_m: 1.2419
+      roof_height_reference: apex
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.10
+      roof_top_radius_source: cut_fraction
+      roof_top_radius_m: 0.1480
+      hopper_height_m: 2.3036
+      outlet_radius_m: 0.150
+      outlet_height_m: 0.5445
+      total_height_m: 7.770
+    catalog:
+      code: "31.550.304"
+      diameter_m: 2.96
+      rings: 4.0
+      height_m: 7.77
+      volume_m3: 33.62
+      capacity_t: 21.50
+
+  - model: "30-4,5-60"
+    source: CASP
+    geometry:
+      radius_m: 1.480
+      cylinder_height_m: 4.090
+      roof_height_m: 1.2419
+      roof_height_reference: apex
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.10
+      roof_top_radius_source: cut_fraction
+      roof_top_radius_m: 0.1480
+      hopper_height_m: 2.3036
+      outlet_radius_m: 0.150
+      outlet_height_m: 0.5345
+      total_height_m: 8.170
+    catalog:
+      code: "31.550.345"
+      diameter_m: 2.96
+      rings: 4.5
+      height_m: 8.17
+      volume_m3: 36.42
+      capacity_t: 23.29
+
+  - model: "36-03-60"
+    source: CASP
+    geometry:
+      radius_m: 1.830
+      cylinder_height_m: 2.760
+      roof_height_m: 1.5356
+      roof_height_reference: apex
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.10
+      roof_top_radius_source: cut_fraction
+      roof_top_radius_m: 0.1830
+      hopper_height_m: 2.9098
+      outlet_radius_m: 0.150
+      outlet_height_m: 0.3646
+      total_height_m: 7.570
+    catalog:
+      code: "31.530.403"
+      diameter_m: 3.66
+      rings: 3.0
+      height_m: 7.57
+      volume_m3: 42.88
+      capacity_t: 27.45
+
+  - model: "36-3,5-60"
+    source: CASP
+    geometry:
+      radius_m: 1.830
+      cylinder_height_m: 3.170
+      roof_height_m: 1.5356
+      roof_height_reference: apex
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.10
+      roof_top_radius_source: cut_fraction
+      roof_top_radius_m: 0.1830
+      hopper_height_m: 2.9098
+      outlet_radius_m: 0.150
+      outlet_height_m: 0.3646
+      total_height_m: 7.980
+    catalog:
+      code: "31.530.435"
+      diameter_m: 3.66
+      rings: 3.5
+      height_m: 7.98
+      volume_m3: 47.10
+      capacity_t: 30.20
+
+  - model: "ovos_mombuca"
+    source: "Ovos Mombuca"
+    geometry:
+      radius_m: 1.150
+      cylinder_height_m: 2.500
+      roof_height_m: 1.000
+      roof_height_reference: opening
+      roof_curvature: 0.0
+      roof_cut_fraction: 0.2652
+      roof_top_radius_source: measured
+      roof_top_radius_m: 0.305
+      hopper_height_m: 2.200
+      outlet_radius_m: 0.230
+      outlet_height_m: 0.550
+      total_height_m: 6.250
+    capacity:
+      usable_volume_m3: 14.165
+      usable_capacity_t: 9.066
+    notes:
+      - "diametro do corpo = 2.30 m"
+      - "diametro superior do chapeu = 0.61 m, portanto roof_top_radius_m = 0.305 m"
+      - "roof_cut_fraction = 0.305 / 1.150 = 0.2652, derivado da medida real"
+      - "diametro da descarga = 0.46 m, portanto outlet_radius_m = 0.230 m"
+      - "outlet_height_m = 0.550 m e uma premissa"
+      - "casco cotado sem o vao inferior = 5.70 m"
+      - "volume util considera corpo cilindrico + tremonha, sem o chapeu"
