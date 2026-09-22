@@ -1,0 +1,5 @@
+{
+  "name": "tmf8829_shim",
+  "version": "0.1.0",
+  "dependencies": { "tmf8829": "*" }
+}

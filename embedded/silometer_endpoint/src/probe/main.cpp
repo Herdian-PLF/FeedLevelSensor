@@ -3,9 +3,8 @@
 //
 //   1. The E32 manual gives 58 bytes as the maximum single air package, but does
 //      not say whether the three fixed-transmission routing bytes count against
-//      it. cfg::kMaxAirPayload assumes they do, which is the conservative
-//      reading; this sweeps write sizes and shows where the module actually
-//      starts sub-packing.
+//      it. Settled by sweeping write sizes: they do, 55 bytes are usable, and a
+//      longer write is truncated rather than sub-packed.
 //   2. millis() does not survive deep sleep and esp_timer_get_time()'s behaviour
 //      across it is not documented. The whole transmission-window schedule is
 //      anchored to esp_rtc_get_time_us(), so it must be shown monotonic first.
@@ -93,7 +92,7 @@ void sendRaw(uint16_t dst, uint8_t len) {
   while (digitalRead(PIN_LORA_AUX) == LOW) {
     delay(1);
   }
-  delay(cfg::kAuxSettleMs);
+  delay(cfg::kAuxStableMs);
   Serial2.write(buf, (size_t)(3 + len));
   Serial2.flush();
 }

@@ -51,7 +51,10 @@ class E32Radio {
   void sleep();
 
  private:
-  bool waitAux(uint32_t timeoutMs);
+  bool waitAuxStable(uint32_t stableMs, uint32_t timeoutMs);
+  bool resetModule();
+  bool sendCommand(const uint8_t* cmd, uint8_t len);
+  uint8_t readAnswer(uint8_t* buf, uint8_t expected, uint32_t timeoutMs);
   void drain();
 
   proto::FrameReader reader_;

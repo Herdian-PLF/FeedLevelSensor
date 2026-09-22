@@ -31,7 +31,7 @@ static const uint8_t PIN_LORA_AUX = 4;   // E32 pin 5, high = idle
 // Mode 3 parameter setting always runs at 9600 8N1 regardless of the baud
 // selected in SPED (E32 manual section 7), so the console baud and this one
 // are not interchangeable.
-static const uint32_t LORA_DEFAULT_BAUD = 9600;
+static const uint32_t BAUD_RATE_UART_LORA_E32900T20D_DEFAULT = 9600;
 
 // Status LED. IO2 drives the on-board LED of the DOIT DevKit V1 and is free in
 // this design. It is a boot strapping pin, but the on-board LED only loads it

@@ -46,8 +46,21 @@ constexpr uint32_t kDataAckTimeoutMs = 3000;
 constexpr uint32_t kInterFragmentGapMs = 20;
 
 constexpr uint32_t kAuxTimeoutMs = 1000;
-constexpr uint32_t kAuxSettleMs = 5;
-constexpr uint32_t kModeSwitchSettleMs = 5;
+
+// E32900T20D manual: the mode pins are only sampled while AUX is high, and a switch does not take 
+// effect until that high level has lasted 2 ms. The margin over 2 ms is free.
+constexpr uint32_t kAuxStableMs = 5;
+
+// E32900T20D manual never says how quickly AUX falls once a command has been sent, so
+// a stability check started immediately would happily measure the high level
+// that preceded the command and conclude the module was done before it began.
+constexpr uint32_t kAuxBusyGuardMs = 10;
+
+// Sections 5.5 (power-on self-check), 5.6.4 note 4 (leaving mode 3 reloads the
+// user parameters) and 7.4 (C4 reset) all hold AUX low for far longer than an
+// ordinary mode switch.
+constexpr uint32_t kAuxResetTimeoutMs = 3000;
+
 constexpr uint32_t kRadioConfigTimeoutMs = 1000;
 
 constexpr uint32_t kTofCpuReadyTimeoutMs = 100;
@@ -62,11 +75,12 @@ constexpr uint8_t kCpuMhz = 80;
 constexpr uint8_t kZoneCount = 64;
 constexpr uint8_t kZoneGrid = 8;
 
-// E32 manual section 2.2: 58 bytes is the maximum single air package, beyond
-// which the module sub-packs on its own. Whether the three fixed-transmission
-// routing bytes count against this is NOT stated in the manual - the value here
-// assumes they do, which is the conservative reading. Phase 1 of the bench plan
-// measures it; raising this number is the only change needed if they do not.
+// E32 manual section 2.2 gives 58 bytes as the maximum single air package but
+// does not say whether the three fixed-transmission routing bytes count against
+// it. Measured on the bench, they do: 55 actually usable. Longer write is
+// truncated rather than sub-packed, so the excess is lost with no error anywhere.
+// Raising this number would put incomplete frames on the wire to fail CRC at the
+// far end.
 constexpr uint8_t kMaxAirPayload = 58;
 constexpr uint8_t kRoutingBytes = 3;
 
@@ -88,7 +102,7 @@ constexpr bool channelIsLegal(uint8_t chan) {
   return (chan >= 0x28 && chan <= 0x2D) || (chan >= 0x35 && chan <= 0x42);
 }
 
-constexpr uint16_t kGatewayId = 0x0001;
+constexpr uint16_t kGatewayId = 0x0001; // ID or Address for grep
 constexpr uint8_t kFirmwareVersion = 0x01;
 
 static_assert(kCycleMinS < kCycleMaxS, "cycle window is inverted");

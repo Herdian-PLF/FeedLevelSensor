@@ -60,7 +60,7 @@ const char* interfaceName(uint8_t features) {
 }
 
 char text[160];
-uint32_t activeBaud = LORA_DEFAULT_BAUD;
+uint32_t activeBaud = BAUD_RATE_UART_LORA_E32900T20D_DEFAULT;
 bool auxEverDipped = false;
 
 void setMode(uint8_t m0, uint8_t m1) {
@@ -187,7 +187,7 @@ void checkVersion(bool ok, const uint8_t* buf) {
   }
   snprintf(text, sizeof(text), "%lu baud", (unsigned long)activeBaud);
   report.pass(text);
-  if (activeBaud != LORA_DEFAULT_BAUD) {
+  if (activeBaud != BAUD_RATE_UART_LORA_E32900T20D_DEFAULT) {
     report.hint("module is NOT at its 9600 default - it has been reconfigured before");
   }
 

@@ -23,3 +23,15 @@ Verify on a WSL terminal through:
 ```
 ls /dev/ttyUSB0
 ```
+
+### Troubleshooting
+
+#### WSL usbip: error: Attach Request for 4-4 failed - Device in error state
+
+From a Windows Admin terminal:
+```
+usbipd unbind --all
+pnputil /add-driver "C:\Program Files\usbipd-win\Drivers\VBoxUSB.inf" /installs
+```
+
+Then re-bind devices

@@ -1,7 +1,7 @@
 # Silometer LoRa point-to-point protocol, v0.1
 
 **Status:** draft, implemented in `embedded/silometer_endpoint/` (endpoint side only)
-**Date:** 2026-09-14
+**Date:** 2026-09-18
 
 A star network: many endpoints, one gateway with internet access. Point-to-point,
 not LoRaWAN — the E32-900T20D is a UART-fronted SX1276 and exposes no LoRaWAN
@@ -9,17 +9,13 @@ stack, and no bare RF module is available. The application framing below is kept
 independent of the radio's own addressing so a later move to LoRaWAN changes the
 transport and not the payload.
 
-This document is the reference for both halves. The gateway is not implemented
-yet; `embedded/silometer_endpoint/src/bench_gateway/` is a test fixture that
-implements enough of the gateway half to exercise the endpoint.
+This document is the reference for both halves.
 
 ## Radio layer
 
 Both ends are E32-900T20D modules configured identically apart from their address.
-Register semantics are from `E32-900T20D_UserManual_EN_v1.3.pdf` section 7.5. That
-manual is not in this repo: it lives with the other supplier documents under
-`poc_silo/hardware_project/docs_suppliers/`, alongside the TMF8829 datasheet and
-shield schematic in `poc_silo/tmf8829/`.
+Register semantics are from `E32-900T20D_UserManual_EN_v1.3.pdf` section 7.5 not in
+this repo.
 
 | Register | Value | Meaning |
 |---|---|---|
@@ -29,7 +25,10 @@ shield schematic in `poc_silo/tmf8829/`.
 | `OPTION` | `0xC4` | fixed transmission, push-pull IO, FEC on, 20 dBm |
 
 Parameters are written with `C0` (saved across power-down) in Mode 3, which always
-runs at 9600 8N1 regardless of the baud selected in `SPED`.
+runs at 9600 8N1 regardless of the baud selected in `SPED`. Commands and mode
+switches both wait on AUX: the module holds it low while busy and drops anything
+sent in that window, and a mode switch only takes effect once AUX has been high
+for 2 ms (manual sections 5.6.4 and 6.1).
 
 **Addressing is done by the radio.** With `OPTION` bit 7 set, the first three bytes
 written to the module are the target `ADDH`, `ADDL`, `CHAN`; the module consumes
@@ -45,13 +44,14 @@ module holding either address receive every frame on its channel.
 `0x28`–`0x2D` or `0x35`–`0x42`. This is enforced at compile time and again on any
 channel the gateway pushes.
 
-**Packet size.** The manual gives 58 bytes as the maximum single air package, with
-automatic sub-packing beyond it. It does **not** say whether the three routing
-bytes count against that limit. The implementation assumes they do — the
-conservative reading — and sizes every frame to fit `58 − 3 = 55` bytes so that one
-application frame is always exactly one air package. `embedded/silometer_endpoint/src/probe/`
-measures the real behaviour; if the routing bytes turn out to be free, raising
-`cfg::kMaxAirPayload` is the only change needed and the fragment count falls out of it.
+**Packet size.** The manual gives 58 bytes as the maximum single air package but does
+not say whether the three routing bytes count against it. Measured on the bench with
+`embedded/silometer_endpoint/src/probe/`: the routing bytes **do** count against the 58,
+leaving 55 bytes of usable payload,and the receiver strips them before the data reaches
+its UART. Writes past that are **truncated, not sub-packed**, which is a different behavior
+then described in the component manual. `cfg::kMaxAirPayload = 58` with `cfg::kRoutingBytes = 3`
+is correct as implemented — raising it would put every frame over 55 bytes on the wire
+incomplete, to fail CRC at the far end.
 
 ## Application frame
 
@@ -237,8 +237,6 @@ identical jitter, collide every window, and look exactly like a range problem.
 
 ## Open items
 
-- Whether the 58-byte air-package limit counts the three fixed-transmission
-  routing bytes, and whether the receiver strips them. Measured by the `probe` app.
 - Field-measured air data rate. 2.4 kbps is the default; the manual's 5.5 km
   reference figure assumes clear open terrain, a 5 dBi antenna at 2.5 m, and ≥5 V
   supply for the full 20 dBm. At 3.2 V from a LiFePO4 cell the module transmits
