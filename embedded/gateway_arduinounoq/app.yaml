@@ -1,0 +1,3 @@
+name: Silometer Gateway Link Check
+icon: 📡
+description: The MCU pushes stand-in silo samples to the MPU over the Bridge; the MPU sets the reporting cadence.

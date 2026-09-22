@@ -19,3 +19,5 @@ python-poc/captures/
 compile_commands.json
 embedded/hardware_verification/vendor/
 embedded/silometer_endpoint/vendor/
+
+embedded/gateway_arduinounoq/.cache/
