@@ -11,9 +11,6 @@ cd synthetic-dataset
 uv sync
 ```
 
-Select `.venv/bin/python` as the kernel. VS Code must be attached to WSL, not Windows — a Linux
-venv is invisible to a Windows-side VS Code. Notebooks resolve `../configs` and `../out`
-relative to the working directory, so they must run with `notebooks/` as the cwd.
 
 ## Notebooks
 
