@@ -27,6 +27,16 @@ downsampling. To run it headless:
 uv run --group dev python -m nbconvert --to notebook --execute --inplace gerar_dataset_5000_cenas_com_silos.ipynb
 ```
 
+## Conversion to .tflite
+
+`scripts/convert_super_resolution_pt_to_tflite.py` takes no token argument: `qai_hub` reads the
+Qualcomm AI Hub token from `~/.qai_hub/client.ini`, written once per machine by `qai-hub configure`.
+
+```bash
+uv run --group convert qai-hub configure --api_token <TOKEN>
+uv run --group convert python scripts/convert_super_resolution_pt_to_tflite.py
+```
+
 ## Configs
 
 | File | Contents |

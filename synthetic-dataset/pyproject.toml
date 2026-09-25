@@ -17,6 +17,7 @@ dependencies = [
 
 [dependency-groups]
 dev = ["nbconvert>=7.16"]
+convert = ["onnx>=1.23", "onnxscript>=0.7", "onnxruntime>=1.30", "qai-hub>=0.55", "ai-edge-litert>=2.2"]
 
 [tool.uv]
 package = false

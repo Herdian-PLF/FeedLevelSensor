@@ -2,7 +2,7 @@
 
 Trains the super-resolution model that reconstructs each scene's `depth_32x32.tif` from its
 `depth_8x8.tif`, using the dataset in `../out/synthetic_depth_dataset/`, and saves the run's
-metrics and charts.
+checkpoint, metrics and charts.
 
 ## Setup
 
@@ -12,11 +12,14 @@ uv sync
 ```
 
 Generate the dataset first (see `../README.md`), then run
-`train_quicksrnet_depth_superresolution.ipynb` with the `synthetic-dataset/.venv` kernel.
+`train_quicksrnet_depth_superresolution.ipynb` with the `synthetic-dataset/.venv` kernel. To export
+the run's `best_model.pt` to `.tflite`, run `../scripts/convert_super_resolution_pt_to_tflite.py`
+(see `../README.md`).
 
 ## Output
 
-Each run is written to `runs/<model class>/`; training the same model again overwrites it.
+Each run is written to `runs/<model class>/` (gitignored); training the same model again overwrites
+it, except `best_model.onnx` and `best_model.tflite`, which only the conversion script rewrites.
 
 ```
 runs/<model class>/
@@ -24,6 +27,8 @@ runs/<model class>/
 ├── dataset_split.csv                 train / val / test split of every scene, with its silo and surface
 ├── history.csv                       one row per epoch
 ├── best_model.pt                     checkpoint of the epoch with the lowest validation MAE, used for every test analysis
+├── best_model.onnx                   best_model.pt exported by the conversion script
+├── best_model.tflite                 best_model.onnx compiled by Qualcomm AI Hub
 ├── test_metrics.json                 global test metrics
 ├── metrics_by_scene.csv              test metrics per scene
 ├── metrics_by_depth_range.csv        test metrics per 500 mm range of reference depth
@@ -34,6 +39,10 @@ runs/<model class>/
 ├── metrics_by_depth_range.png        MAE, within_tolerance_pct and bias per depth range
 └── examples.png                      input, prediction, reference and absolute error of 4 test scenes
 ```
+
+The model, `best_model.onnx` and `best_model.tflite` take float32 `[1, 1, 8, 8]` and return
+`[1, 1, 32, 32]`, both as depth in mm ÷ `depth_max_mm` (`config.json`, the sensor's max range)
+clipped to `[0, 1]`. `0` in the input means no return; the output predicts a depth for every pixel.
 
 ## Metrics
 
@@ -64,7 +73,7 @@ of that group; they are not averages of per-scene values.
 
 | Column | Meaning |
 |---|---|
-| `epoch` | epoch number |
+| `epoch` | epoch number; training stops after `EARLY_STOPPING_PATIENCE` (20) epochs without a lower `val_mae_mm`, or at `epochs` (`config.json`) |
 | `train_mae_mm` | absolute error summed over every valid training pixel of the epoch, divided by their count; each batch is measured before its weight update, so it can exceed `val_mae_mm` in the first epochs |
 | `val_mae_mm` | `mae_mm` on the validation split at the end of the epoch |
 | `val_within_tolerance_pct` | `within_tolerance_pct` on the validation split at the end of the epoch |
