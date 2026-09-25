@@ -5,6 +5,7 @@ __pycache__/
 
 simulation/out/
 synthetic-dataset/out/
+synthetic-dataset/train_model/runs
 *.zip
 python-poc/driver/
 python-poc/captures/

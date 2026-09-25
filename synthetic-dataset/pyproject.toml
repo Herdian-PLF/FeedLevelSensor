@@ -10,6 +10,9 @@ dependencies = [
     "pyyaml>=6.0",
     "matplotlib>=3.9",
     "ipykernel>=6.29",
+    "pandas>=3.0",
+    "torch>=2.14",
+    "scikit-learn>=1.9",
 ]
 
 [dependency-groups]
@@ -22,3 +25,15 @@ package = false
 # Conda must not back this venv: it is always on PATH here, and the repo already lost a
 # Jupyter kernel that way (see python-poc/pyproject.toml).
 python-preference = "only-managed"
+
+[tool.uv.sources]
+# PyPI's torch wheels bundle CUDA 13, which needs NVIDIA driver >= 580; the WSL dev machine
+# runs 566 (CUDA <= 12.7), so the GPU would go unused. The cu126 index has no macOS wheels.
+torch = [
+    { index = "pytorch-cu126", marker = "sys_platform == 'linux' or sys_platform == 'win32'" },
+]
+
+[[tool.uv.index]]
+name = "pytorch-cu126"
+url = "https://download.pytorch.org/whl/cu126"
+explicit = true
