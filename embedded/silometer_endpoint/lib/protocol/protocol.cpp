@@ -65,9 +65,8 @@ uint8_t encodeHello(uint16_t src, uint8_t seq, const HelloInfo& info, uint8_t* o
   p[5] = info.validZones;
   putU16(p + 6, info.frameNumberLo);
   putU16(p + 8, info.bootCount);
-  p[10] = info.resetReason;
-  p[11] = info.consecutiveFailedCycles;
-  p[12] = info.fwVersion;
+  p[10] = info.consecutiveFailedCycles;
+  p[11] = info.fwVersion;
   return finish(out, Type::Hello, src, seq, 0, 0, kHelloBytes);
 }
 
@@ -155,9 +154,8 @@ bool parseHello(const Frame& frame, HelloInfo* out) {
   out->validZones = p[5];
   out->frameNumberLo = getU16(p + 6);
   out->bootCount = getU16(p + 8);
-  out->resetReason = p[10];
-  out->consecutiveFailedCycles = p[11];
-  out->fwVersion = p[12];
+  out->consecutiveFailedCycles = p[10];
+  out->fwVersion = p[11];
   return true;
 }
 

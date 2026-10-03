@@ -26,11 +26,16 @@ uint8_t sampleSnr[cfg::kMaxTofFrames][cfg::kZoneCount];
 // Picks the median sample by distance and returns that sample's index, so the
 // reported SNR belongs to the distance actually reported rather than to a
 // different frame. Samples with no target are excluded, not treated as zero.
+//
+// Presence is decided by SNR, not distance: the sensor only reports a peak at or
+// above its confidence threshold and leaves SNR at 0 otherwise, while a strong
+// return off the cover glass reads 0 mm with a high SNR. Keying on distance
+// would ship a dirty or blocked window as "nothing in range".
 bool medianSample(uint8_t zone, uint8_t frames, uint16_t* distance, uint8_t* snr) {
   uint8_t order[cfg::kMaxTofFrames];
   uint8_t n = 0;
   for (uint8_t f = 0; f < frames; ++f) {
-    if (samples[f][zone] != 0) {
+    if (sampleSnr[f][zone] != 0) {
       order[n++] = f;
     }
   }

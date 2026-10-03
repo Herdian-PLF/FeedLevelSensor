@@ -98,7 +98,7 @@ Fragment *i* carries zones `13i` through `13i + 12`, row-major over the 8×8 gri
 
 ### `0x1 HELLO` — endpoint to gateway
 
-13-byte payload. Telemetry rides here rather than in the data burst so it still
+12-byte payload. Telemetry rides here rather than in the data burst so it still
 reaches the gateway when the burst fails.
 
 | offset | size | field |
@@ -111,15 +111,15 @@ reaches the gateway when the burst fails.
 | 5 | 1 | zones with a target |
 | 6 | 2 | sensor frame number, low 16 bits |
 | 8 | 2 | boot count, low 16 bits |
-| 10 | 1 | `esp_reset_reason()` |
-| 11 | 1 | consecutive failed cycles |
-| 12 | 1 | firmware version |
+| 10 | 1 | consecutive failed cycles |
+| 11 | 1 | firmware version |
 
 Flags: bit 0 sensor fault, bit 1 degraded reading, bit 2 this is a retry.
 
-Boot count, reset reason and the failed-cycle counter exist because the prototype
-board has **no battery sense path at all**. A rising brownout-reset count is the
-only available proxy for a dying cell.
+Boot count and the failed-cycle counter exist because the prototype board has
+**no battery sense path at all**. Boot count falls back to 1 whenever the RTC
+domain loses power, so frequent cold restarts are the only available proxy for
+a dying cell.
 
 ### `0x2 HELLO_ACK` — gateway to endpoint
 

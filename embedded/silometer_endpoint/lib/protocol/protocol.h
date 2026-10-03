@@ -7,7 +7,7 @@
 
 #include <stdint.h>
 
-#include "app_config.hpp"
+#include "link_config.h"
 
 namespace proto {
 
@@ -71,12 +71,11 @@ struct HelloInfo {
   uint8_t validZones;
   uint16_t frameNumberLo;
   uint16_t bootCount;
-  uint8_t resetReason;
   uint8_t consecutiveFailedCycles;
   uint8_t fwVersion;
 };
 
-constexpr uint8_t kHelloBytes = 13;
+constexpr uint8_t kHelloBytes = 12;
 static_assert(kHelloBytes <= kMaxPayloadBytes, "HELLO does not fit one air packet");
 
 struct Frame {

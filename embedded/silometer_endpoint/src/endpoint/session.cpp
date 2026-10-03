@@ -5,7 +5,6 @@
 #include "app_config.hpp"
 #include "e32_radio.h"
 #include "log.hpp"
-#include "power.h"
 
 namespace {
 
@@ -61,7 +60,6 @@ proto::HelloInfo buildHello(const RtcState& state, uint8_t sensorFlags) {
   info.validZones = state.cachedReading.validZones;
   info.frameNumberLo = (uint16_t)(state.cachedReading.frameNumber & 0xFFFF);
   info.bootCount = (uint16_t)(state.bootCount & 0xFFFF);
-  info.resetReason = (uint8_t)resetReasonCode();
   info.consecutiveFailedCycles = state.consecutiveFailedCycles;
   info.fwVersion = cfg::kFirmwareVersion;
   return info;

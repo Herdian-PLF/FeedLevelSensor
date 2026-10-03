@@ -102,8 +102,8 @@ void onHello(const proto::Frame& frame) {
     LOG_W(kTag, "malformed HELLO");
     return;
   }
-  LOG_I(kTag, "HELLO from 0x%04X seq=%u frags=%u valid=%u boot=%u reset=%u fails=%u flags=0x%02X",
-        frame.src, frame.seq, info.fragCount, info.validZones, info.bootCount, info.resetReason,
+  LOG_I(kTag, "HELLO from 0x%04X seq=%u frags=%u valid=%u boot=%u fails=%u flags=0x%02X",
+        frame.src, frame.seq, info.fragCount, info.validZones, info.bootCount,
         info.consecutiveFailedCycles, info.flags);
 
   const proto::HelloStatus status = forcedStatus;

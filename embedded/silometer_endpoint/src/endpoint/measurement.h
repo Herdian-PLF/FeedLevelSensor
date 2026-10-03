@@ -4,11 +4,11 @@
 
 #include "app_config.hpp"
 
-// One aggregated measurement set. Distances are radial range in millimetres,
-// with 0 meaning no target - the sensor's own sentinel, preserved rather than
-// translated so the gateway sees gaps as gaps. SNR is the raw companded byte;
-// it is decoded host-side, where the companding curve can change without a
-// firmware release.
+// One aggregated measurement set. Distances are radial range in millimetres.
+// SNR is the raw companded byte, decoded host-side where the companding curve
+// can change without a firmware release; SNR 0 means no target - the sensor's
+// own sentinel, preserved rather than translated so the gateway sees gaps as
+// gaps. Distance 0 with a non-zero SNR is a real return at the cover glass.
 struct Reading {
   uint16_t distanceMm[cfg::kZoneCount];
   uint8_t snr[cfg::kZoneCount];

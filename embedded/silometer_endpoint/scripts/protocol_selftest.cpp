@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "app_config.hpp"
 #include "protocol.h"
 
 static int failures = 0;
@@ -82,7 +83,6 @@ static void testHello() {
   in.validZones = 57;
   in.frameNumberLo = 0xBEEF;
   in.bootCount = 1234;
-  in.resetReason = 5;
   in.consecutiveFailedCycles = 2;
   in.fwVersion = cfg::kFirmwareVersion;
 
