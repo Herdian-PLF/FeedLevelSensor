@@ -1,6 +1,22 @@
+# arduino:zephyr is pinned because the gateway needs Serial1 for the E32 while
+# the Bridge runs on lpuart1. Arduino_RouterBridge issue #76 reported that
+# opening a second UART killed the Bridge for the rest of the boot on core
+# 0.90.0; it does not reproduce on 1.0.0. Moving off this version means
+# re-testing that the two coexist before trusting a session.
+#
+# A profile is a closed dependency set, so every transitive dependency has to be
+# named: leaving any of them out makes the core fall back to its stub
+# Arduino_RouterBridge.h, which fails the build with a request to install the
+# library. MsgPack pulls ArxContainer, ArxTypeTraits and DebugLog.
 profiles:
   default:
     platforms:
-      - platform: arduino:zephyr
+      - platform: arduino:zephyr (1.0.0)
     libraries:
+      - Arduino_RouterBridge (0.4.3)
+      - Arduino_RPClite (0.3.1)
+      - MsgPack (0.4.2)
+      - ArxContainer (0.7.0)
+      - ArxTypeTraits (0.3.2)
+      - DebugLog (0.8.4)
 default_profile: default

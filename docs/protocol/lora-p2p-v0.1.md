@@ -1,7 +1,7 @@
 # Silometer LoRa point-to-point protocol, v0.1
 
-**Status:** draft, implemented in `embedded/silometer_endpoint/` (endpoint side only)
-**Date:** 2026-09-18
+**Status:** draft, implemented in `embedded/silometer_endpoint/` and `embedded/gateway_arduinounoq`
+**Date:** 2026-09-22
 
 A star network: many endpoints, one gateway with internet access. Point-to-point,
 not LoRaWAN — the E32-900T20D is a UART-fronted SX1276 and exposes no LoRaWAN

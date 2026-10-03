@@ -20,9 +20,17 @@ BOARD_APPS=${UNOQ_APPS_DIR:-/home/arduino/ArduinoApps}
 BOARD_APP="$BOARD_APPS/$APP_NAME"
 BOARD_STAGE="/tmp/unoq-sync"
 
-# scripts/ is excluded in both directions: adb pull drops the exec bit, so a round trip
-# would come back and overwrite this file with an unrunnable copy of itself.
-EXCLUDES=(--exclude=.cache --exclude=__pycache__ --exclude='*.pyc' --exclude=.venv --exclude=scripts)
+# scripts/ and test/ are excluded in both directions: neither is built on the board,
+# and adb pull drops the exec bit, so a round trip would come back and overwrite this
+# file with an unrunnable copy of itself.
+EXCLUDES=(--exclude=.cache --exclude=__pycache__ --exclude='*.pyc' --exclude=.venv
+          --exclude=scripts --exclude=test)
+
+# sketch/src/protocol is a symlink to the endpoint's wire-format library, so both
+# firmwares encode the same frames. push dereferences it and the board gets real
+# files; pull must leave it alone, or the board copy would replace the link and the
+# two ends would start drifting apart silently.
+SHARED_LINK=sketch/src/protocol
 
 die() { echo "unoq: $*" >&2; exit 1; }
 
@@ -89,7 +97,7 @@ cmd_push() {
 
     local stage="$tmp/out/$APP_NAME"
     mkdir -p "$stage"
-    rsync -a "${EXCLUDES[@]}" "$APP_DIR"/ "$stage"/
+    rsync -aL "${EXCLUDES[@]}" "$APP_DIR"/ "$stage"/
     sh_ "rm -rf $BOARD_STAGE && mkdir -p $BOARD_STAGE"
     adb_ push "$stage" "$BOARD_STAGE/" >/dev/null 2>&1 || die "adb push failed"
     # Everything but .cache is replaced: dropping the cache costs a full sketch rebuild.
@@ -111,7 +119,7 @@ cmd_pull() {
     show_diff "$tmp/$APP_NAME" "overwriting in the repo:" || true
     [[ $dry == -n ]] && return 0
 
-    rsync -a --delete "${EXCLUDES[@]}" "$tmp/$APP_NAME"/ "$APP_DIR"/
+    rsync -a --delete "${EXCLUDES[@]}" --exclude="$SHARED_LINK" "$tmp/$APP_NAME"/ "$APP_DIR"/
     echo "pulled into $APP_DIR - review with git diff before committing"
 }
 
@@ -123,6 +131,9 @@ case ${1:-} in
     stop)    require_board_app; cli app stop "$BOARD_APP" ;;
     logs)    require_board_app; cli app logs "$BOARD_APP" --follow ;;
     monitor) cli monitor ;;
-    run)     cmd_push; cli app start "$BOARD_APP"; cli app logs "$BOARD_APP" --follow ;;
+    # start refuses to run against an app that is already up, and after a push the
+    # board is always holding the previous build.
+    run)     cmd_push; cli app stop "$BOARD_APP" >/dev/null 2>&1 || true
+             cli app start "$BOARD_APP"; cli app logs "$BOARD_APP" --follow ;;
     *)       sed -n '2,20p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'; exit 1 ;;
 esac

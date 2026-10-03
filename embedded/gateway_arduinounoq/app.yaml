@@ -1,3 +1,3 @@
-name: Silometer Gateway Link Check
+name: Silometer Gateway
 icon: 📡
-description: The MCU pushes stand-in silo samples to the MPU over the Bridge; the MPU sets the reporting cadence.
+description: The MCU runs the E32 radio and the LoRa p2p session; the MPU batches the readings and pushes them upstream.
