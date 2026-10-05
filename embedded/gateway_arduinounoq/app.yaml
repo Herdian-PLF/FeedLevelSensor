@@ -1,3 +1,5 @@
 name: Silometer Gateway
 icon: 📡
-description: The MCU runs the E32 radio and the LoRa p2p session; the MPU batches the readings and pushes them upstream.
+description: The MCU runs the E32 radio and the LoRa p2p session; the MPU batches the readings, pushes them upstream and serves a live distance map per endpoint.
+bricks:
+  - arduino:web_ui

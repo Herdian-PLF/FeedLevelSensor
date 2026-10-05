@@ -1,8 +1,10 @@
 """MPU half of the silo gateway: it takes decoded readings from the MCU over the
 Bridge, keeps the most complete copy of each transmission window, and pushes
-batches upstream. The radio, the framing and the session live on the MCU."""
+batches upstream. It also serves a web page showing each endpoint's latest
+distance map. The radio, the framing and the session live on the MCU."""
 
 from arduino.app_utils import *
+from arduino.app_bricks.web_ui import WebUI
 
 import threading
 import time
@@ -26,6 +28,12 @@ _telemetry = {}
 # zones inside RPClite's 256-byte request buffer. _grids accumulates them until
 # on_reading closes the window.
 _grids = {}
+
+# The web view's only state: the latest map and message time per endpoint. No
+# history is kept; the uplink is where readings are archived.
+_endpoints = {}
+
+ui = WebUI()
 
 
 def _now():
@@ -73,6 +81,8 @@ def on_hello(
     }
     with _lock:
         _telemetry[(endpoint, seq)] = {"received_at": _now(), **record}
+        snapshot = dict(_touch_endpoint(endpoint))
+    _publish(snapshot)
 
     print(
         f"hello 0x{endpoint:04x} seq={seq} valid={valid_zones}/64 T={temperature_c}C "
@@ -89,11 +99,16 @@ def on_zones(endpoint: int, seq: int, first_zone: int, distance_mm, snr):
             # 0 is the sensor's own no-target sentinel, so an unfilled zone and a
             # zone that saw nothing read the same. The fragment mask on the
             # closing on_reading is what tells the two apart.
-            grid = {"distance_mm": [0] * ZONE_COUNT, "snr_raw": [0] * ZONE_COUNT}
+            grid = {
+                "distance_mm": [0] * ZONE_COUNT,
+                "snr_raw": [0] * ZONE_COUNT,
+                "zone_received": [False] * ZONE_COUNT,
+            }
             _grids[key] = grid
         for offset, (distance, snr_raw) in enumerate(zip(distance_mm, snr)):
             grid["distance_mm"][first_zone + offset] = distance
             grid["snr_raw"][first_zone + offset] = snr_raw
+            grid["zone_received"][first_zone + offset] = True
 
 
 def on_reading(endpoint: int, seq: int, mask: int, complete: int):
@@ -103,19 +118,56 @@ def on_reading(endpoint: int, seq: int, mask: int, complete: int):
         if grid is None:
             print(f"reading 0x{endpoint:04x} seq={seq} closed with no zones; dropped", flush=True)
             return
+        zone_received = grid.pop("zone_received")
+        telemetry = _telemetry.get(key)
+        received_at = _now()
         _readings[key] = {
             "endpoint": endpoint,
             "seq": seq,
-            "received_at": _now(),
+            "received_at": received_at,
             "fragment_mask": mask,
             "complete": bool(complete),
-            "telemetry": _telemetry.get(key),
+            "telemetry": telemetry,
             **grid,
         }
         pending = len(_readings)
+        view = _touch_endpoint(endpoint)
+        view["map"] = {
+            "seq": seq,
+            "received_at": received_at,
+            "complete": bool(complete),
+            "valid_zones": telemetry["valid_zones"] if telemetry else None,
+            "distance_mm": list(grid["distance_mm"]),
+            "zone_received": zone_received,
+        }
+        snapshot = dict(view)
+    _publish(snapshot)
 
     state = "complete" if complete else f"partial mask=0x{mask:04x}"
     print(f"reading 0x{endpoint:04x} seq={seq} {state}, {pending} queued", flush=True)
+
+
+def _touch_endpoint(endpoint):
+    # Caller holds _lock. Any frame from an endpoint registers it, so it shows up
+    # in the page's list from its first HELLO, before a map has arrived.
+    view = _endpoints.get(endpoint)
+    if view is None:
+        view = {"endpoint": endpoint, "map": None}
+        _endpoints[endpoint] = view
+        print(f"web: endpoint 0x{endpoint:04x} registered", flush=True)
+    view["last_message_at"] = _now()
+    return view
+
+
+def _publish(view):
+    ui.send_message("endpoint_update", view)
+
+
+def _on_snapshot(_sid, _data):
+    # Asked for by the page on every (re)connect, so a browser opened mid-window
+    # or after a dropped socket starts from the current state, not an empty list.
+    with _lock:
+        return {"endpoints": [dict(v) for v in _endpoints.values()]}
 
 
 def push_to_cloud(batch):
@@ -203,6 +255,8 @@ Bridge.provide("on_gateway_fault", on_gateway_fault)
 Bridge.provide("on_hello", on_hello)
 Bridge.provide("on_zones", on_zones)
 Bridge.provide("on_reading", on_reading)
+
+ui.on_message("snapshot", _on_snapshot)
 
 
 def _ask_mcu_status():

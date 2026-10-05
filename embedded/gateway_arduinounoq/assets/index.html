@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Silometer Gateway</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>Silometer Gateway</h1>
+        <span id="link" class="link down">connecting…</span>
+      </header>
+
+      <section class="controls">
+        <label for="endpoint">Endpoint</label>
+        <select id="endpoint" disabled>
+          <option>no endpoint heard yet</option>
+        </select>
+      </section>
+
+      <section class="status">
+        <div><span class="key">Last message</span> <span id="last-message">—</span></div>
+        <div><span class="key">Map</span> <span id="map-info">—</span></div>
+      </section>
+
+      <section class="map-area">
+        <div id="grid" class="grid" aria-label="distance map, mm"></div>
+        <div class="scale">
+          <span id="scale-max">—</span>
+          <div class="bar"></div>
+          <span id="scale-min">—</span>
+          <span class="unit">mm</span>
+        </div>
+      </section>
+
+      <section class="legend">
+        <span><i class="swatch none"></i>no target</span>
+        <span><i class="swatch lost"></i>fragment lost</span>
+      </section>
+    </main>
+
+    <script src="libs/socket.io.min.js"></script>
+    <script src="libs/arduino.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
