@@ -24,7 +24,10 @@ constexpr uint32_t kSleepTestS = 20;
 // A fresh air package cannot follow the previous byte immediately; at 2.4 kbps
 // the inter-package gap is far longer than the ~1 ms between bytes at 9600 baud.
 constexpr uint32_t kGapThresholdMs = 15;
-constexpr uint32_t kQuietMs = 1500;
+// Must outlast the gap between back-to-back packets, or one burst is reported
+// as several.
+constexpr uint32_t kQuietMs = cfg::kPacketAirMs + 1500;
+constexpr uint8_t kAirTimeBurst = 5;
 
 const uint8_t kSweep[] = {40, 52, 55, 58, 61, 64, 80, 120};
 
@@ -107,9 +110,24 @@ void runSender() {
     Serial.printf("payload %u bytes (UART write %u including routing)\n", kSweep[i],
                   kSweep[i] + 3);
     sendRaw(cfg::kGatewayId, kSweep[i]);
-    delay(4000);
+    delay(kQuietMs + cfg::kPacketAirMs + 1000);
   }
   Serial.println("sweep done");
+}
+
+// Back-to-back full packets: the receiver's spacing between package starts is
+// the real per-packet time that cfg::kPacketAirMs only extrapolates.
+void runAirTimeSender() {
+  if (!bringUpRadio(kBuiltInEndpointId)) {
+    return;
+  }
+  Serial.printf("sending %u full packets back to back; extrapolated %lu ms each at %lu bps\n",
+                kAirTimeBurst, (unsigned long)cfg::kPacketAirMs,
+                (unsigned long)cfg::airRateBps(cfg::kAirRate));
+  for (uint8_t i = 0; i < kAirTimeBurst; ++i) {
+    sendRaw(cfg::kGatewayId, cfg::kMaxAirPayload - cfg::kRoutingBytes);
+  }
+  Serial.println("burst queued");
 }
 
 void runReceiver() {
@@ -123,6 +141,7 @@ void runReceiver() {
   uint16_t runLen = 0;
   uint8_t runs = 0;
   uint16_t runSizes[16];
+  uint32_t runStartMs[16];
   uint32_t lastByteMs = 0;
 
   while (true) {
@@ -135,6 +154,9 @@ void runReceiver() {
         }
         ++runs;
         runLen = 0;
+      }
+      if (runLen == 0 && runs < 16) {
+        runStartMs[runs] = now;
       }
       ++total;
       ++runLen;
@@ -152,6 +174,13 @@ void runReceiver() {
         Serial.printf(" %u", runSizes[i]);
       }
       Serial.println();
+      if (runs > 1) {
+        Serial.print("package start spacing (ms):");
+        for (uint8_t i = 1; i < runs && i < 16; ++i) {
+          Serial.printf(" %lu", (unsigned long)(runStartMs[i] - runStartMs[i - 1]));
+        }
+        Serial.println();
+      }
       total = 0;
       runLen = 0;
       runs = 0;
@@ -169,7 +198,8 @@ void runReceiver() {
 void menu() {
   Serial.println("\nkeys:  s = deep sleep 20 s and re-check the RTC counter");
   Serial.println("       a = air-size sweep, sender role");
-  Serial.println("       b = air-size sweep, receiver role (any key stops it)");
+  Serial.println("       b = air-size sweep / air-time burst, receiver role (any key stops it)");
+  Serial.println("       t = air-time burst, sender role");
 }
 
 }  // namespace
@@ -194,6 +224,7 @@ void loop() {
     case 's': sleepTest(); break;
     case 'a': runSender(); break;
     case 'b': runReceiver(); break;
+    case 't': runAirTimeSender(); break;
     default: menu(); break;
   }
 }

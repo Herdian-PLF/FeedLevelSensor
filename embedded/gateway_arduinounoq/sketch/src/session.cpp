@@ -145,7 +145,7 @@ Action Session::tick(uint32_t nowMs) {
     return action;
   }
   const bool complete = mask_ == proto::kCompleteMask;
-  if (!complete && (nowMs - lastFragmentMs_) < kBurstQuietMs) {
+  if (!complete && (nowMs - lastFragmentMs_) < cfg::kBurstQuietMs) {
     return action;
   }
   burstOpen_ = false;

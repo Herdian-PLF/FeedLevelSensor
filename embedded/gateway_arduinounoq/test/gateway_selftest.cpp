@@ -182,7 +182,7 @@ void testLostFragmentIsRetriedWithinTheWindow() {
 
   // An incomplete burst is held open until the quiet timer expires.
   CHECK(!s.tick(now).transmit);
-  now += gw::kBurstQuietMs;
+  now += cfg::kBurstQuietMs;
   gw::Action a = s.tick(now);
   CHECK(a.transmit);
   CHECK(a.readingReady);
@@ -218,7 +218,7 @@ void testNewWindowStartsFromAnEmptyGrid() {
   now += 100;
   CHECK(wireFragment(&w, 0x0007, 11, 0, g));
   s.onFrame(w.frame, now);
-  now += gw::kBurstQuietMs;
+  now += cfg::kBurstQuietMs;
   s.tick(now);
 
   now += 1000;
@@ -241,7 +241,7 @@ void testARoundThatGainsNothingIsNotForwardedTwice() {
   now += 100;
   CHECK(wireFragment(&w, 0x0007, 13, 0, g));
   s.onFrame(w.frame, now);
-  now += gw::kBurstQuietMs;
+  now += cfg::kBurstQuietMs;
   CHECK(s.tick(now).readingReady);
 
   // The same fragment again: the endpoint must still be acknowledged, but the
@@ -249,7 +249,7 @@ void testARoundThatGainsNothingIsNotForwardedTwice() {
   now += 500;
   CHECK(wireFragment(&w, 0x0007, 13, 0, g));
   s.onFrame(w.frame, now);
-  now += gw::kBurstQuietMs;
+  now += cfg::kBurstQuietMs;
   const gw::Action a = s.tick(now);
   CHECK(a.transmit);
   CHECK(!a.readingReady);

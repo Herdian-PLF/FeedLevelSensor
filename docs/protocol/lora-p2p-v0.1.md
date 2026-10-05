@@ -24,6 +24,14 @@ this repo.
 | `CHAN` | `0x35` | carrier = 862 MHz + CHAN = 915 MHz |
 | `OPTION` | `0xC4` | fixed transmission, push-pull IO, FEC on, 20 dBm |
 
+**Air rate.** `SPED[2:0]` comes from `cfg::kAirRate`. Every air-time-bound timer on
+both ends derives from it (see [Timers and retry policy](#timers-and-retry-policy)),
+so a range sweep changes only that constant. 2.4 kbps is the slowest rate these
+modules accept: the bench units (C3 model `0x32`, version `0x82`) reject 0.3k and
+1.2k although the manual lists them. The `C0` echo returns the old `SPED`, and the
+readback after a `C4` reset confirms it. 4.8k is accepted, so the module rejects
+only the rates below 2.4k; the driver and the write path are not at fault.
+
 Parameters are written with `C0` (saved across power-down) in Mode 3, which always
 runs at 9600 8N1 regardless of the baud selected in `SPED`. Commands and mode
 switches both wait on AUX: the module holds it low while busy and drops anything
@@ -213,9 +221,18 @@ failed window carries on from what the gateway already has.
 | Retry after silence | uniform 10–120 s | uniform 2–3 s |
 | Retry after BUSY | 5 s | 2 s |
 | Attempts per window | 4 | 4 |
-| HELLO reply timeout | 2000 ms | 2000 ms |
-| DATA_ACK timeout | 3000 ms | 3000 ms |
+| HELLO reply timeout | 2 × *P* + 1000 ms | same |
+| DATA_ACK timeout | *Q* + *P* + 1500 ms | same |
+| Gateway burst quiet timer *Q* | *P* + 750 ms | same |
 | Inner data rounds | 3 (1 + 2 retries) | 3 |
+
+*P* is the time one full packet spends on air, `cfg::kPacketAirMs`. The manual does
+not give it. It is the ~470 ms measured at 2.4 kbps, scaled by air rate. At 2.4 kbps
+the timeouts come out at 1940 ms (HELLO reply), 3190 ms (DATA_ACK) and 1220 ms (*Q*).
+The bench window tracks the worst-case session; at 2.4 kbps that is 20 s, which gives
+the 18–22 s window above. The endpoint's DATA_ACK timeout must outlast *Q* plus one
+packet, or a burst that lost its last fragment is given up before the gateway acks
+it. A `static_assert` in `app_config.hpp` enforces this.
 
 Four attempts exhausted, or a retry that would not fit inside the remaining
 window, means the endpoint sleeps to the next window instead.
@@ -237,11 +254,13 @@ identical jitter, collide every window, and look exactly like a range problem.
 
 ## Open items
 
-- Field-measured air data rate. 2.4 kbps is the default; the manual's 5.5 km
-  reference figure assumes clear open terrain, a 5 dBi antenna at 2.5 m, and ≥5 V
-  supply for the full 20 dBm. At 3.2 V from a LiFePO4 cell the module transmits
-  below 20 dBm, so a 3 km hilly link may need 1.2 or 0.3 kbps. The air-rate bits
-  live in `cfg::kLoraSped`.
+- Field range at 2.4 kbps. The manual's 5.5 km reference figure assumes clear
+  open terrain, a 5 dBi antenna at 2.5 m, and ≥5 V supply for the full 20 dBm. At
+  3.2 V from a LiFePO4 cell the module transmits below 20 dBm. A slower air rate is
+  not available on these modules (see [Air rate](#radio-layer)), so the remaining
+  levers are the supply, the antennas and their height, or a different module.
+  Whether firmware `0x82` can be made to accept 0.3k or 1.2k is an open question
+  for EBYTE.
 - ANATEL dwell-time and duty-cycle rules for digital modulation in these bands.
   Almost certainly moot at a 30-minute cycle; bench retries at 2 s are not.
 - Gateway-side arbitration when several endpoints collide repeatedly. v0.1 has no

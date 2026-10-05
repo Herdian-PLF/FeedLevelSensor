@@ -11,6 +11,7 @@
 #include <stdint.h>
 
 #include "link_config.h"
+#include "protocol.h"
 
 #if defined(BENCH_TIMING) && defined(FIELD_TIMING)
 #error "pick exactly one timing profile"
@@ -18,10 +19,30 @@
 
 namespace cfg {
 
+constexpr uint8_t kMaxAttempts = 4;
+constexpr uint8_t kInnerRetries = 2;
+constexpr uint8_t kMaxTofFrames = 7;
+
+// Each reply is at most one packet behind one of ours, so two packets on air
+// bound the wait. The 1000 ms margin covers the gateway's poll and UART.
+constexpr uint32_t kHelloReplyTimeoutMs = 2 * kPacketAirMs + 1000;
+// If the last fragment is lost, the ack only leaves after the gateway's quiet
+// timer has run from the one before it.
+constexpr uint32_t kDataAckTimeoutMs = kBurstQuietMs + kPacketAirMs + 1500;
+constexpr uint32_t kInterFragmentGapMs = 20;
+
+// One round in which every wait runs to its timeout. The 20 s floor is the
+// value the 2.4 kbps schedule was validated with.
+constexpr uint32_t kSlowSessionMs =
+    kHelloReplyTimeoutMs + proto::kFragmentCount * kAuxTimeoutMs + kDataAckTimeoutMs;
+constexpr uint32_t kWorstCaseCycleMs = kSlowSessionMs > 20000 ? kSlowSessionMs : 20000;
+
 #if defined(BENCH_TIMING)
 constexpr const char* kProfile = "BENCH";
-constexpr uint32_t kCycleMinS = 18;
-constexpr uint32_t kCycleMaxS = 22;
+// Tracks the session length so a slow air rate still gets whole cycles on the
+// bench instead of every session overrunning its own window.
+constexpr uint32_t kCycleMinS = kWorstCaseCycleMs / 1000 - 2;
+constexpr uint32_t kCycleMaxS = kWorstCaseCycleMs / 1000 + 2;
 constexpr uint32_t kRetryMinS = 2;
 constexpr uint32_t kRetryMaxS = 3;
 constexpr uint32_t kBusyRetryS = 2;
@@ -40,25 +61,18 @@ constexpr uint8_t kTofFramesPerReading = 5;
 constexpr uint32_t kCycleWatchdogMs = 60000;
 #endif
 
-constexpr uint8_t kMaxAttempts = 4;
-constexpr uint8_t kInnerRetries = 2;
-constexpr uint8_t kMaxTofFrames = 7;
-
-constexpr uint32_t kHelloReplyTimeoutMs = 2000;
-constexpr uint32_t kDataAckTimeoutMs = 3000;
-constexpr uint32_t kInterFragmentGapMs = 20;
-
 constexpr uint32_t kTofCpuReadyTimeoutMs = 100;
 constexpr uint32_t kTofFrameTimeoutMs = 1500;
 constexpr uint8_t kMinValidZones = 8;
 
 constexpr uint32_t kMinSleepS = 1;
-constexpr uint32_t kWorstCaseCycleMs = 20000;
 constexpr uint8_t kCpuMhz = 80;
 
 constexpr uint8_t kFirmwareVersion = 0x01;
 
 static_assert(kCycleMinS < kCycleMaxS, "cycle window is inverted");
+static_assert(kDataAckTimeoutMs > kBurstQuietMs + kPacketAirMs,
+              "the endpoint gives up before the gateway's quiet timer can ack");
 static_assert(kRetryMinS <= kRetryMaxS, "retry window is inverted");
 static_assert(kRetryMaxS * kMaxAttempts < kCycleMinS, "retries must fit inside one window");
 static_assert(kTofFramesPerReading <= kMaxTofFrames, "raise kMaxTofFrames");

@@ -90,7 +90,8 @@ sleeping endpoint wake on its own and confirm the timer path.
 
 The bench and field timing profiles are two complete blocks in `app_config.hpp`,
 selected by `-DBENCH_TIMING`. Edit the values there; the boot banner prints which
-profile is compiled in.
+profile is compiled in. Radio timeouts are not edited there: they derive from
+`cfg::kAirRate` in `lib/protocol/link_config.h`, which the gateway shares.
 
 ## Bench test
 
