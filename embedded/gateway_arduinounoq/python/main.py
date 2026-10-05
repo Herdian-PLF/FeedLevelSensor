@@ -204,4 +204,21 @@ Bridge.provide("on_hello", on_hello)
 Bridge.provide("on_zones", on_zones)
 Bridge.provide("on_reading", on_reading)
 
+
+def _ask_mcu_status():
+    # The MCU's own on_gateway_up goes out before this container exists, whether
+    # at boot or after a flash. On a cold boot the reverse can hold, and the MCU
+    # is still in setup() when this runs, hence the retries.
+    for _ in range(10):
+        try:
+            Bridge.call("gateway_status")
+            return
+        except Exception as err:
+            last_err = err
+            time.sleep(3)
+    print(f"MCU never answered gateway_status: {last_err}", flush=True)
+
+
+threading.Thread(target=_ask_mcu_status, daemon=True).start()
+
 App.run(user_loop=loop)

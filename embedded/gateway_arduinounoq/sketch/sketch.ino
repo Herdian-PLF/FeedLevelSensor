@@ -19,6 +19,13 @@ uint8_t rxBuf[proto::kMaxFrameBytes];
 bool radioReady = false;
 uint32_t lastRadioComplaintMs = 0;
 
+// receive() reports at most one rejection per poll, so this counts polls that
+// saw a bad frame rather than bad frames; enough to tell noise from silence.
+uint32_t framesOk = 0;
+uint32_t pollsRejected = 0;
+uint32_t pollsRejectedReported = 0;
+uint32_t lastRejectReportMs = 0;
+
 // Reused rather than built per chunk: Bridge.notify packs its parameters before
 // it returns, and both are only ever touched from the loop thread.
 std::vector<int> distances;
@@ -97,6 +104,16 @@ int queue_config(int endpoint, int interval_s, int channel, int tof_frames, int 
     return queued ? 1 : 0;
 }
 
+// setup() has said everything worth saying seconds before the MPU container has
+// registered a handler to hear it, so the MPU asks for it again once it is up.
+int gateway_status() {
+    gw::logf("gw: 0x%04X radio %s, channel 0x%02X (%u MHz), up %lu s, ok=%lu rejected=%lu",
+             cfg::kGatewayId, radioReady ? "listening" : "DOWN", cfg::kLoraChannel,
+             862u + cfg::kLoraChannel, (unsigned long)(millis() / 1000),
+             (unsigned long)framesOk, (unsigned long)pollsRejected);
+    return radioReady ? 1 : 0;
+}
+
 }  // namespace
 
 void setup() {
@@ -107,6 +124,7 @@ void setup() {
     // loop() reads. provide_safe runs it on the loop thread, provide runs it on
     // the Bridge thread.
     Bridge.provide_safe("queue_config", queue_config);
+    Bridge.provide_safe("gateway_status", gateway_status);
 
     distances.reserve(proto::kZonesPerFragment);
     snr.reserve(proto::kZonesPerFragment);
@@ -146,8 +164,21 @@ void loop() {
     }
 
     proto::Frame frame;
-    if (radio.receive(&frame, rxBuf, sizeof(rxBuf), gw::kPollMs) == gw::E32Rx::Ok) {
+    const gw::E32Rx rx = radio.receive(&frame, rxBuf, sizeof(rxBuf), gw::kPollMs);
+    if (rx == gw::E32Rx::Ok) {
+        ++framesOk;
         apply(session.onFrame(frame, millis()));
+    } else if (rx == gw::E32Rx::Malformed) {
+        ++pollsRejected;
     }
     apply(session.tick(millis()));
+
+    // Rejected frames are the one thing that tells a corrupted link from a silent
+    // one, and logging each would put a Bridge notify in every 50 ms poll.
+    const uint32_t now = millis();
+    if (pollsRejected != pollsRejectedReported && now - lastRejectReportMs >= 10000) {
+        gw::logf("gw: %lu polls rejected a frame since boot", (unsigned long)pollsRejected);
+        pollsRejectedReported = pollsRejected;
+        lastRejectReportMs = now;
+    }
 }
