@@ -1,0 +1,3 @@
+name: LiteRT CPU Inference
+icon: 🔬
+description: Minimal .tflite inference on the UNO Q CPU with ai-edge-litert, using the silo super-resolution model.

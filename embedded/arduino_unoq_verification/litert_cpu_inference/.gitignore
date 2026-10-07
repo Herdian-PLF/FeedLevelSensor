@@ -1,0 +1,5 @@
+# ignore app cache folder
+.cache/
+
+# copied from synthetic-dataset/train_model/runs/, which is not versioned either
+models/
