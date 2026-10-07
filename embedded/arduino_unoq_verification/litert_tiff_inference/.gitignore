@@ -1,0 +1,9 @@
+# ignore app cache folder
+.cache/
+
+# copied from synthetic-dataset, which is not versioned either
+models/
+data/
+
+# written by the app
+output/
