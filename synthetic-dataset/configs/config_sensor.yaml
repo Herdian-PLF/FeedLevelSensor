@@ -1,0 +1,26 @@
+sensor:
+  model: tmf8829
+  fov_diagonal_deg: 80.0
+  min_range_m: 0.010
+  max_range_m: 11.0
+  low_size: 8
+  high_size: 32
+  noise_sigma_mm: 10.0
+  dropout_fraction: 0.03
+
+pose_ranges:
+  sensor_height_fraction:
+    min: 0.0
+    max: 1.0
+
+  azimuth_deg:
+    min: 0.0
+    max: 360.0
+
+  radial_offset_fraction:
+    min: 0.0
+    max: 1.0
+
+  tilt_deg:
+    min: -38.0
+    max: 38.0

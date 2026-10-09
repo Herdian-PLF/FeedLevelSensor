@@ -1,0 +1,485 @@
+superficies:
+- id: 1
+  tipo: Plana (assentada)
+  parametros:
+    lambda_m: 1.0
+    beta_deg: 0
+    nu: 0.95
+    a0_m: 0.03
+- id: 2
+  tipo: Plana (assentada)
+  parametros:
+    lambda_m: 1.1
+    beta_deg: 45
+    nu: 0.65
+    a0_m: 0.03
+- id: 3
+  tipo: Plana (assentada)
+  parametros:
+    lambda_m: 1.15
+    beta_deg: 135
+    nu: 0.8
+    a0_m: 0.03
+- id: 4
+  tipo: Plana (assentada)
+  parametros:
+    lambda_m: 1.2
+    beta_deg: 225
+    nu: 0.95
+    a0_m: 0.03
+- id: 5
+  tipo: Plana (assentada)
+  parametros:
+    lambda_m: 1.3
+    beta_deg: 315
+    nu: 0.8
+    a0_m: 0.03
+- id: 6
+  tipo: Monte lateral com cratera central
+  parametros:
+    epsilon: 0.2
+    alpha: 1.0
+    depth_factor: 1.2
+    theta_deg: 0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 7
+  tipo: Monte lateral com cratera central
+  parametros:
+    epsilon: 0.35
+    alpha: 0.6
+    depth_factor: 0.55
+    theta_deg: 90
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 8
+  tipo: Monte lateral com cratera central
+  parametros:
+    epsilon: 0.5
+    alpha: 0.9
+    depth_factor: 1.0
+    theta_deg: 180
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 9
+  tipo: Monte lateral com cratera central
+  parametros:
+    epsilon: 0.5
+    alpha: 0.4
+    depth_factor: 1.0
+    theta_deg: 270
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 10
+  tipo: Monte lateral com cratera central
+  parametros:
+    epsilon: 0.35
+    alpha: 0.75
+    depth_factor: 0.35
+    theta_deg: 135
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 11
+  tipo: Cratera de descarga
+  parametros:
+    rho: 0.55
+    depth_factor: 0.35
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 12
+  tipo: Cratera de descarga
+  parametros:
+    rho: 0.75
+    depth_factor: 0.8
+    phi_deg: 34
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 13
+  tipo: Cratera de descarga
+  parametros:
+    rho: 0.9
+    depth_factor: 1.0
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 14
+  tipo: Cratera de descarga
+  parametros:
+    rho: 1.0
+    depth_factor: 1.2
+    phi_deg: 48
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 15
+  tipo: Cratera de descarga
+  parametros:
+    rho: 1.1
+    depth_factor: 0.55
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 16
+  tipo: Monte deslocado (boca lateral)
+  parametros:
+    alpha: 1.25
+    c:
+    - 0.0
+    - 0.0
+    c_norm: 0.0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 17
+  tipo: Monte deslocado (boca lateral)
+  parametros:
+    alpha: 0.9
+    c:
+    - 0.3
+    - 0.0
+    c_norm: 0.3
+    c_angle_deg: 0.0
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 18
+  tipo: Monte deslocado (boca lateral)
+  parametros:
+    alpha: 1.25
+    c:
+    - -0.212
+    - 0.212
+    c_norm: 0.3
+    c_angle_deg: 135.0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 19
+  tipo: Monte deslocado (boca lateral)
+  parametros:
+    alpha: 0.9
+    c:
+    - 0.424
+    - -0.424
+    c_norm: 0.6
+    c_angle_deg: 315.0
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 20
+  tipo: Monte deslocado (boca lateral)
+  parametros:
+    alpha: 1.25
+    c:
+    - 0.0
+    - 0.45
+    c_norm: 0.45
+    c_angle_deg: 90.0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 21
+  tipo: Plano inclinado (escorregada)
+  parametros:
+    k: 0.2
+    phi_deg: 28
+    theta_deg: 0
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 22
+  tipo: Plano inclinado (escorregada)
+  parametros:
+    k: 0.5
+    phi_deg: 32
+    theta_deg: 90
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 23
+  tipo: Plano inclinado (escorregada)
+  parametros:
+    k: 0.8
+    phi_deg: 38
+    theta_deg: 180
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 24
+  tipo: Plano inclinado (escorregada)
+  parametros:
+    k: 1.0
+    phi_deg: 48
+    theta_deg: 45
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 25
+  tipo: Plano inclinado (escorregada)
+  parametros:
+    k: 1.2
+    phi_deg: 48
+    theta_deg: 270
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 26
+  tipo: Cratera excêntrica (canal de fluxo lateral)
+  parametros:
+    epsilon: 0.1
+    rho: 0.55
+    depth_factor: 0.35
+    theta_deg: 0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 27
+  tipo: Cratera excêntrica (canal de fluxo lateral)
+  parametros:
+    epsilon: 0.3
+    rho: 0.75
+    depth_factor: 0.8
+    theta_deg: 90
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 28
+  tipo: Cratera excêntrica (canal de fluxo lateral)
+  parametros:
+    epsilon: 0.4
+    rho: 0.9
+    depth_factor: 1.0
+    theta_deg: 135
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 29
+  tipo: Cratera excêntrica (canal de fluxo lateral)
+  parametros:
+    epsilon: 0.5
+    rho: 1.0
+    depth_factor: 1.2
+    theta_deg: 180
+    phi_deg: 48
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 30
+  tipo: Cratera excêntrica (canal de fluxo lateral)
+  parametros:
+    epsilon: 0.7
+    rho: 1.1
+    depth_factor: 0.8
+    theta_deg: 270
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 31
+  tipo: Frente de avalanche (dois patamares)
+  parametros:
+    h: 0.05
+    x0: 0.0
+    theta_deg: 0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 32
+  tipo: Frente de avalanche (dois patamares)
+  parametros:
+    h: 0.1
+    x0: -0.3
+    theta_deg: 90
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 33
+  tipo: Frente de avalanche (dois patamares)
+  parametros:
+    h: 0.15
+    x0: 0.3
+    theta_deg: 180
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 34
+  tipo: Frente de avalanche (dois patamares)
+  parametros:
+    h: 0.2
+    x0: 0.0
+    theta_deg: 45
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 35
+  tipo: Frente de avalanche (dois patamares)
+  parametros:
+    h: 0.2
+    x0: -0.6
+    theta_deg: 270
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 36
+  tipo: Cone truncado (topo achatado)
+  parametros:
+    h_t: 0.3
+    epsilon: 0.0
+    theta_deg: 0
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 37
+  tipo: Cone truncado (topo achatado)
+  parametros:
+    h_t: 0.45
+    epsilon: 0.2
+    theta_deg: 90
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 38
+  tipo: Cone truncado (topo achatado)
+  parametros:
+    h_t: 0.6
+    epsilon: 0.0
+    theta_deg: 180
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 39
+  tipo: Cone truncado (topo achatado)
+  parametros:
+    h_t: 0.6
+    epsilon: 0.4
+    theta_deg: 45
+    phi_deg: 38
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 40
+  tipo: Cone truncado (topo achatado)
+  parametros:
+    h_t: 0.45
+    epsilon: 0.4
+    theta_deg: 225
+    phi_deg: 30
+    nu: auto
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 41
+  tipo: Rathole (canal central)
+  parametros:
+    rho_0: 0.2
+    d_star: 0.95
+    n: 16
+    nu: 0.95
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 42
+  tipo: Rathole (canal central)
+  parametros:
+    rho_0: 0.3
+    d_star: 0.9
+    n: 24
+    nu: 0.95
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 43
+  tipo: Rathole (canal central)
+  parametros:
+    rho_0: 0.6
+    d_star: 0.8
+    n: 32
+    nu: 0.95
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 44
+  tipo: Rathole (canal central)
+  parametros:
+    rho_0: 0.4
+    d_star: 0.7
+    n: 8
+    nu: 0.85
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
+- id: 45
+  tipo: Rathole (canal central)
+  parametros:
+    rho_0: 0.5
+    d_star: 0.95
+    n: 8
+    nu: 0.95
+    lambda_m: 1.15
+    beta_deg: 0
+    a0_m: 0.03
